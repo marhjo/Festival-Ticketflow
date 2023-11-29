@@ -1,4 +1,5 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
+import { Button, Card } from "./base";
 
 const price = {
   regular: 799,
@@ -24,7 +25,10 @@ export const Sale = () => {
     vip: 0,
   });
 
-  const [tents, setTents] = createSignal(0);
+  const [tents, setTents] = createSignal({
+    type: 0,
+    count: 0,
+  });
 
   const totalPeople = createMemo(() =>
     Object.values(people()).reduce((acc, val) => acc + val, 0),
@@ -32,19 +36,21 @@ export const Sale = () => {
 
   const realPrice = createMemo(() => {
     const values = people();
+    const tent = tents();
 
     return (
       Object.keys(values).reduce(
         (acc, key) => acc + values[key] * price[key],
         0,
-      ) + tentPrice[tents()]
+      ) +
+      tentPrice[tent.type] * tent.count
     );
   });
 
   return (
     <div class="w-[600px]">
-      <div class="flex justify-between items-center">
-        <h2 class="text-2xl font-semibold mb-2">Place</h2>
+      <div class="flex items-center justify-between">
+        <h2 class="mb-2 text-2xl font-semibold">Place</h2>
 
         <p class="text-lg font-medium">
           Total: {realPrice} <span class="text-subtext0">DKK</span>
@@ -53,19 +59,19 @@ export const Sale = () => {
 
       <div class="grid grid-cols-2 gap-3">
         <div class="flex flex-col gap-2">
-          <div class="flex flex-col justify-center items-center p-4 w-full min-h-[130px] bg-base rounded-lg">
+          <Card class="min-h-[130px] items-center justify-center">
             {page() === 0 && "Image here."}
 
             {page() === 1 && (
               <>
-                <p class="text-left w-full font-medium text-lg mb-4">Tents</p>
+                <p class="mb-4 w-full text-left text-lg font-medium">Tents</p>
 
                 <div class="px-8">
                   <img alt="" src="/svgs/tent.svg" />
                 </div>
               </>
             )}
-          </div>
+          </Card>
 
           <div class="px-2 text-lg">
             <p>Address</p>
@@ -100,27 +106,27 @@ export const Sale = () => {
             <Tents count={totalPeople} tents={[tents, setTents]} />
           )}
 
-          <div class="flex justify-between gap-3 items-center">
+          <div class="flex items-center justify-between gap-3">
             {page() === 0 && <div />}
 
             {page() > 0 && (
-              <button
+              <Button
                 type="button"
-                class="flex justify-center items-center w-10 h-10 rounded-md bg-red-400 text-white font-medium"
-                on:click={() => {
+                color="error"
+                square
+                onClick={() => {
                   setPage(0);
-                  setTents(0);
+                  setTents({ type: 0, count: 0 });
                 }}
               >
                 <IcBaselineDelete />
-              </button>
+              </Button>
             )}
 
-            <div class="flex justify-end gap-3 items-center">
-              <button
+            <div class="flex items-center justify-end gap-3">
+              <Button
                 type="button"
-                class="px-3 py-2 rounded-md bg-blue-500 text-white font-medium"
-                on:click={() => {
+                onClick={() => {
                   let nextPage = page() + 1;
                   const peeps = totalPeople();
 
@@ -136,7 +142,7 @@ export const Sale = () => {
               >
                 {page() === 0 && "Next"}
                 {page() === 1 && (tents() === 0 ? "Skip" : "Next")}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -146,8 +152,8 @@ export const Sale = () => {
 };
 
 const Ticket = ({ type, people: [people, setPeople], children, color }) => (
-  <div class="flex flex-col gap-3 bg-base p-4 rounded-lg">
-    <div class="flex justify-between gap-3 items-center">
+  <Card>
+    <div class="flex items-center justify-between gap-3">
       <p class={`text-lg font-medium ${color}`}>{name[type]}</p>
       <p class="text-lg font-medium">
         {price[type]} <span class="text-subtext0">DKK</span>
@@ -156,10 +162,14 @@ const Ticket = ({ type, people: [people, setPeople], children, color }) => (
 
     <p class="mt-[-8px]">{children}</p>
 
-    <div class="flex gap-2 items-center justify-end">
-      <button
+    <div class="flex items-center justify-end gap-2">
+      <Button
         type="button"
-        class="w-7 h-7 rounded-md bg-blue-500 text-white font-medium"
+        size="sm"
+        square
+        reactive={{
+          color: () => (people()[type] < 1 ? "disabled" : "primary"),
+        }}
         on:click={() =>
           setPeople((people) => ({
             ...people,
@@ -168,21 +178,22 @@ const Ticket = ({ type, people: [people, setPeople], children, color }) => (
         }
       >
         -
-      </button>
+      </Button>
 
-      <p class="text-lg font-medium px-[2px]">{people()[type]}</p>
+      <p class="px-[2px] text-lg font-medium">{people()[type]}</p>
 
-      <button
+      <Button
         type="button"
-        class="w-7 h-7 rounded-md bg-blue-500 text-white font-medium"
+        size="sm"
+        square
         on:click={() =>
           setPeople((people) => ({ ...people, [type]: people[type] + 1 }))
         }
       >
         +
-      </button>
+      </Button>
     </div>
-  </div>
+  </Card>
 );
 
 const Tents = ({ count, tents }) => (
@@ -194,10 +205,9 @@ const Tents = ({ count, tents }) => (
 
 const Tent = ({ count, tents: [tents, setTents], many }) => {
   const classes = () => {
-    let base =
-      "flex flex-col gap-3 bg-base p-4 rounded-lg cursor-pointer border-2 transition-[border]";
+    let base = "cursor-pointer border-2 transition-[border]";
 
-    if (tents() === count) {
+    if (tents().type === count) {
       base += " border-blue";
     } else {
       base += " border-transparent";
@@ -207,21 +217,35 @@ const Tent = ({ count, tents: [tents, setTents], many }) => {
   };
 
   return (
-    <div
-      class={classes()}
-      on:click={() => setTents((tents) => (count === tents ? 0 : count))}
+    <Card
+      reactive={{
+        class: classes,
+      }}
+      on:click={() =>
+        setTents((tent) =>
+          count === tent.type
+            ? {
+                type: 0,
+                count: 0,
+              }
+            : {
+                type: count,
+                count: many,
+              },
+        )
+      }
     >
-      <div class="flex justify-between gap-3 items-center">
+      <div class="flex items-center justify-between gap-3">
         <p class="text-lg font-medium">{count}-Person Tent</p>
         <p class="text-lg font-medium">
-          {tentPrice[count]} <span class="text-subtext0">DKK</span>
+          {tentPrice[count] * many} <span class="text-subtext0">DKK</span>
         </p>
       </div>
 
       <p class="mt-[-8px]">
         Have our crew set up {many} x {count}-person tent for you.
       </p>
-    </div>
+    </Card>
   );
 };
 

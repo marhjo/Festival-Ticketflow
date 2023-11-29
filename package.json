@@ -25,11 +25,13 @@
     "react-dom": "^18.0.0",
     "solid-js": "^1.4.3",
     "solid-spring": "^0.0.7",
+    "tailwind-variants": "^0.1.18",
     "tailwindcss": "^3.3.3"
   },
   "devDependencies": {
     "@catppuccin/tailwindcss": "^0.1.6",
     "prettier": "^3.1.0",
-    "prettier-plugin-astro": "^0.12.2"
+    "prettier-plugin-astro": "^0.12.2",
+    "prettier-plugin-tailwindcss": "^0.5.7"
   }
 }

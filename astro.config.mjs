@@ -9,10 +9,10 @@ export default defineConfig({
   integrations: [
     tailwind(),
     solid({
-      include: ["**/solid/*"],
+      include: ["**/solid/**/*"],
     }),
     react({
-      include: ["**/react/*"],
+      include: ["**/react/**/*"],
     }),
   ],
 });

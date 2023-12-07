@@ -16,7 +16,7 @@ import { Sale } from "../components/solid/sale";
 
   <body>
     <div
-      class="grid place-items-center h-screen content-center bg-crust text-text"
+      class="grid h-screen place-items-center content-center bg-crust text-text"
     >
       <Button>Tailwind Button in Astro!</Button>
 
@@ -36,3 +36,16 @@ import { Sale } from "../components/solid/sale";
     </div>
   </body>
 </html>
+
+<style lang="scss" is:inline>
+  *::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    border: 4px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 9999px;
+    background-color: #aaaaaa;
+  }
+</style>

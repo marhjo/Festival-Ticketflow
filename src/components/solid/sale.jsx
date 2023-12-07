@@ -1,5 +1,6 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
-import { Button, Card } from "./base";
+import { Button, Card, Input, Toggle } from "./base";
+import { validateEmail } from "@/lib/validate";
 
 const price = {
   regular: 799,
@@ -18,11 +19,25 @@ const name = {
 };
 
 export const Sale = () => {
-  const [page, setPage] = createSignal(0);
+  const [disabled, setDisabled] = createSignal(false);
+  const [page, setPage] = createSignal(2);
 
   const [people, setPeople] = createSignal({
-    regular: 0,
-    vip: 0,
+    regular: 1,
+    vip: 1,
+  });
+
+  const [shareEmail, setShareEmail] = createSignal(false);
+  const [sharedEmail, setSharedEmail] = createSignal("");
+
+  const [infos, setInfos] = createSignal({
+    regular: {},
+    vip: {},
+  });
+
+  const [emails, setEmails] = createSignal({
+    regular: {},
+    vip: {},
   });
 
   const [tents, setTents] = createSignal({
@@ -43,18 +58,47 @@ export const Sale = () => {
         (acc, key) => acc + values[key] * price[key],
         0,
       ) +
-      tentPrice[tent.type] * tent.count
+      tentPrice[tent.type] * tent.count +
+      99
     );
+  });
+
+  const emailsValid = createMemo(() => {
+    const isShared = shareEmail();
+    const shared = sharedEmail();
+    const e = emails();
+    const p = people();
+
+    if (isShared) return validateEmail(shared);
+
+    return Object.keys(e).every((key) =>
+      new Array(p[key])
+        .fill(null)
+        .every((_, index) => validateEmail(e[key][index])),
+    );
+  });
+
+  const infosValid = createMemo(() => {
+    const i = infos();
+    const p = people();
+
+    return Object.keys(i).every((key) =>
+      new Array(p[key])
+        .fill(null)
+        .every(
+          (_, index) => i[key][index]?.firstName && i[key][index]?.lastName,
+        ),
+    );
+  });
+
+  const isDisabled = createMemo(() => {
+    return disabled() || (page() == 2 && (!emailsValid() || !infosValid()));
   });
 
   return (
     <div class="w-[600px]">
       <div class="flex items-center justify-between">
         <h2 class="mb-2 text-2xl font-semibold">Place</h2>
-
-        <p class="text-lg font-medium">
-          Total: {realPrice} <span class="text-subtext0">DKK</span>
-        </p>
       </div>
 
       <div class="grid grid-cols-2 gap-3">
@@ -68,6 +112,57 @@ export const Sale = () => {
 
                 <div class="px-8">
                   <img alt="" src="/svgs/tent.svg" />
+                </div>
+              </>
+            )}
+
+            {page() >= 2 && (
+              <>
+                <p class="w-full text-left text-lg font-medium">Breakdown</p>
+
+                <div class="flex w-full flex-col items-center justify-between gap-1">
+                  {[
+                    {
+                      name: "Regular",
+                      count: people().regular,
+                      price: price.regular,
+                    },
+                    { name: "VIP", count: people().vip, price: price.vip },
+                    {
+                      name: "Tent",
+                      count: tents().count,
+                      price: tentPrice[tents().type],
+                    },
+                    null,
+                    { name: "Booking Fee", count: 1, price: 99 },
+                  ].map((value) => {
+                    if (value === null) {
+                      return (
+                        <div class="my-1 w-full px-1">
+                          <div class="h-[1px] w-full bg-peach" />
+                        </div>
+                      );
+                    }
+
+                    const { name, count, price } = value;
+
+                    if (count === 0) return null;
+
+                    const x = count > 1 ? " x " + count : "";
+
+                    return (
+                      <div class="flex w-full items-center justify-between">
+                        <div>
+                          {name}
+                          {x}
+                        </div>
+
+                        <div>
+                          {price * count} <span class="text-subtext0">DKK</span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </>
             )}
@@ -106,27 +201,51 @@ export const Sale = () => {
             <Tents count={totalPeople} tents={[tents, setTents]} />
           )}
 
-          <div class="flex items-center justify-between gap-3">
-            {page() === 0 && <div />}
+          {page() === 2 && (
+            <TicketInfos
+              people={people}
+              infos={[infos, setInfos]}
+              shareEmail={[shareEmail, setShareEmail]}
+              sharedEmail={[sharedEmail, setSharedEmail]}
+              emails={[emails, setEmails]}
+            />
+          )}
 
-            {page() > 0 && (
-              <Button
-                type="button"
-                color="error"
-                square
-                onClick={() => {
-                  setPage(0);
-                  setTents({ type: 0, count: 0 });
-                }}
-              >
-                <IcBaselineDelete />
-              </Button>
-            )}
+          {page() === 3 && <ConfirmAge setDisabled={setDisabled} />}
+
+          <p class="text-right text-lg font-medium">
+            Total: {realPrice()} <span class="text-subtext0">DKK</span>
+          </p>
+
+          <div class="flex items-center justify-between gap-3">
+            <div />
 
             <div class="flex items-center justify-end gap-3">
+              {page() > 0 && (
+                <Button
+                  type="button"
+                  color="error"
+                  onClick={() => {
+                    const currentPage = page();
+
+                    if (currentPage === 1) setTents({ type: 0, count: 0 });
+
+                    setDisabled(false);
+                    setPage(currentPage - 1);
+                  }}
+                >
+                  Back
+                </Button>
+              )}
+
               <Button
                 type="button"
+                reactive={{
+                  color: () => (isDisabled() ? "disabled" : "primary"),
+                }}
                 onClick={() => {
+                  if (isDisabled()) return;
+
                   let nextPage = page() + 1;
                   const peeps = totalPeople();
 
@@ -142,6 +261,9 @@ export const Sale = () => {
               >
                 {page() === 0 && "Next"}
                 {page() === 1 && (tents() === 0 ? "Skip" : "Next")}
+                {page() === 2 && "Next"}
+                {page() === 3 && "Checkout"}
+                {page() === 4 && "Confirm"}
               </Button>
             </div>
           </div>
@@ -245,6 +367,183 @@ const Tent = ({ count, tents: [tents, setTents], many }) => {
       <p class="mt-[-8px]">
         Have our crew set up {many} x {count}-person tent for you.
       </p>
+    </Card>
+  );
+};
+
+const TicketInfos = ({
+  people,
+  infos,
+  shareEmail: [shareEmail, setShareEmail],
+  sharedEmail: [sharedEmail, setSharedEmail],
+  emails,
+}) => {
+  const validEmail = () => sharedEmail() === "" || validateEmail(sharedEmail());
+
+  return (
+    <>
+      <div>
+        <div class="flex items-center gap-2">
+          <p>Shared Email</p>
+
+          <Toggle state={[shareEmail, setShareEmail]} />
+        </div>
+
+        {shareEmail() && (
+          <div class="mt-1 w-full">
+            <Input
+              value={sharedEmail()}
+              onInput={(e) => setSharedEmail(e.target.value)}
+              placeholder="john.doe@gmail.com"
+              type="email"
+              reactive={{
+                class: () =>
+                  "w-full border border-transparent" +
+                  (validEmail() ? "" : " border-red"),
+              }}
+            />
+          </div>
+        )}
+      </div>
+
+      <div class="flex max-h-[400px] flex-col gap-2 overflow-y-auto rounded-md">
+        {Object.keys(people()).map((type) =>
+          new Array(people()[type])
+            .fill(null)
+            .map((_, index) => (
+              <TicketInfo {...{ type, index, infos, emails, shareEmail }} />
+            )),
+        )}
+      </div>
+    </>
+  );
+};
+
+const TicketInfo = ({
+  type,
+  index,
+  infos: [infos, setInfos],
+  emails: [emails, setEmails],
+  shareEmail,
+}) => {
+  const info = () => infos()[type][index] || { firstName: "", lastName: "" };
+
+  const email = () => emails()[type][index] ?? "";
+
+  const validEmail = () => email() === "" || validateEmail(email());
+
+  return (
+    <Card class="gap-2">
+      <div class="flex items-center justify-between gap-3">
+        <p class={"text-lg font-medium"}>
+          #{index + 1} {name[type]}
+        </p>
+      </div>
+
+      <div className="flex gap-2">
+        <div class="w-full">
+          <p class="mb-1 text-sm font-medium">First Name</p>
+
+          <Input
+            value={info().firstName}
+            onInput={(e) =>
+              setInfos((infos) => ({
+                ...infos,
+                [type]: {
+                  ...infos[type],
+                  [index]: {
+                    ...info(),
+                    firstName: e.target.value,
+                  },
+                },
+              }))
+            }
+            placeholder="John"
+            type="text"
+            class="w-full"
+          />
+        </div>
+
+        <div class="w-full">
+          <p class="mb-1 text-sm font-medium">Last Name</p>
+
+          <Input
+            value={info().lastName}
+            onInput={(e) =>
+              setInfos((infos) => ({
+                ...infos,
+                [type]: {
+                  ...infos[type],
+                  [index]: {
+                    ...info(),
+                    lastName: e.target.value,
+                  },
+                },
+              }))
+            }
+            placeholder="Doe"
+            type="text"
+            class="w-full"
+          />
+        </div>
+      </div>
+
+      {!shareEmail() && (
+        <div class="w-full">
+          <p class="mb-1 text-sm font-medium">Email</p>
+
+          <Input
+            placeholder="john.doe@gmail.com"
+            value={email()}
+            onInput={(e) =>
+              setEmails((emails) => ({
+                ...emails,
+                [type]: {
+                  ...emails[type],
+                  [index]: e.target.value,
+                },
+              }))
+            }
+            type="email"
+            reactive={{
+              class: () =>
+                "w-full border border-transparent" +
+                (validEmail() ? "" : " border-red"),
+            }}
+          />
+        </div>
+      )}
+    </Card>
+  );
+};
+
+const ConfirmAge = ({ setDisabled }) => {
+  const [age, setAge] = createSignal(false);
+
+  setDisabled(true);
+
+  return (
+    <Card class="items-center gap-2">
+      <p class="text-lg font-medium">Confirm Age</p>
+
+      <p>
+        You must be 18 years or older to attend this event. Please confirm you
+        are of age.
+      </p>
+
+      <div className="flex items-center gap-1">
+        <p>Everyone is of age</p>
+
+        <Toggle
+          state={[
+            age,
+            (state) => {
+              setDisabled(!state);
+              setAge(state);
+            },
+          ]}
+        />
+      </div>
     </Card>
   );
 };

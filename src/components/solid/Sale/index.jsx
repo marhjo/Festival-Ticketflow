@@ -1,8 +1,9 @@
-import { createEffect, createMemo, createSignal } from "solid-js";
+import { createEffect, createMemo, createSignal, Suspense } from "solid-js";
 import { validateEmail } from "@/lib/validate";
 import { reserve } from "@/lib/queries/reserve";
 import { fullfill } from "@/lib/queries/fullfill";
 import { addPeople } from "@/lib/supabase/addPeople";
+import { getAvailableSpots } from "@/lib/gets/getAvailableSpots";
 import { price, baseFee, tentPrice } from "./info";
 import { nanoid } from "nanoid";
 
@@ -16,7 +17,7 @@ import { Billing } from "./pages/Billing";
 import { Confirm } from "./pages/Confirm";
 import { Done } from "./pages/Done";
 
-export const Sale = () => {
+const Internal = ({ spots }) => {
   const [page, setPage] = createSignal(0);
   const [disabled, setDisabled] = createSignal(false);
 
@@ -300,5 +301,15 @@ export const Sale = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+export const Sale = () => {
+  const spots = getAvailableSpots();
+
+  return (
+    <Suspense fallback={"Loading..."}>
+      <Internal spots={spots.data} />
+    </Suspense>
   );
 };

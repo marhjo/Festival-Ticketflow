@@ -1,9 +1,24 @@
-import { Card } from "../base";
+import { Card, Spinner } from "../base";
 import { price, tentPrice, baseFee } from "./info";
 
-export const Side = ({ page, people, tents, realPrice }) => (
+export const Side = ({ spots, page, people, tents, realPrice }) => (
   <Card class="min-h-[130px] items-center justify-center">
-    {page() === 0 && "Image here."}
+    {page() === 0 && (
+      <div class="flex w-full flex-col items-center gap-1">
+        {spots().value &&
+          spots().value.map(({ area, spots, available }) => (
+            <div class="flex w-full items-center justify-between">
+              <p class="font-medium">{area}</p>
+
+              <p>
+                {available}/{spots}
+              </p>
+            </div>
+          ))}
+
+        {spots().loading && <Spinner />}
+      </div>
+    )}
 
     {page() === 1 && (
       <>

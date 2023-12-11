@@ -1,16 +1,12 @@
-import { createQuery } from "@tanstack/solid-query";
-import { baseUrl, getQueryClient } from ".";
+import { createQuery } from "@/lib/query";
+import { baseUrl } from ".";
 
 export const getAvailableSpots = () =>
-  createQuery(
-    () => ({
-      queryKey: ["getAvailableSpots"],
-      queryFn: async () => {
-        const response = await fetch(`${baseUrl}/available-spots`);
-        return await response.json();
-      },
-      refetchInterval: 10000,
-      refetchOnWindowFocus: true,
-    }),
-    getQueryClient,
-  );
+  createQuery({
+    key: () => ["getAvailableSpots"],
+    refetch: () => 10000,
+    fn: async () => {
+      const response = await fetch(`${baseUrl}/available-spots`);
+      return await response.json();
+    },
+  });

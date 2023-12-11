@@ -53,12 +53,12 @@ export const Toggle = ({ children: _, state: [state, setState], ...props }) => {
   );
 };
 
-export const Spinner = ({ children: _, ...props }) => {
+export const Spinner = ({ children: _, class: c, ...props }) => {
   const styles = spinner(props);
 
   return (
     <svg
-      class={styles.base()}
+      class={styles.base({ class: c })}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

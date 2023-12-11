@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, Suspense } from "solid-js";
+import { createEffect, createMemo, createSignal } from "solid-js";
 import { validateEmail } from "@/lib/validate";
 import { reserve } from "@/lib/queries/reserve";
 import { fullfill } from "@/lib/queries/fullfill";
@@ -17,7 +17,9 @@ import { Billing } from "./pages/Billing";
 import { Confirm } from "./pages/Confirm";
 import { Done } from "./pages/Done";
 
-const Internal = ({ spots }) => {
+export const Sale = () => {
+  const spots = getAvailableSpots();
+
   const [page, setPage] = createSignal(0);
   const [disabled, setDisabled] = createSignal(false);
 
@@ -210,7 +212,7 @@ const Internal = ({ spots }) => {
 
       <div class="grid grid-cols-2 gap-3">
         <div class="flex flex-col gap-2">
-          <Side {...{ page, people, tents, realPrice }} />
+          <Side {...{ spots, page, people, tents, realPrice }} />
 
           <div class="px-2 text-lg">
             <p>Address</p>
@@ -301,15 +303,5 @@ const Internal = ({ spots }) => {
         </div>
       </div>
     </div>
-  );
-};
-
-export const Sale = () => {
-  const spots = getAvailableSpots();
-
-  return (
-    <Suspense fallback={"Loading..."}>
-      <Internal spots={spots.data} />
-    </Suspense>
   );
 };

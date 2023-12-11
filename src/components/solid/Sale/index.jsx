@@ -4,7 +4,7 @@ import { reserve } from "@/lib/queries/reserve";
 import { fullfill } from "@/lib/queries/fullfill";
 import { addPeople } from "@/lib/supabase/addPeople";
 import { getAvailableSpots } from "@/lib/gets/getAvailableSpots";
-import { price, baseFee, tentPrice } from "./info";
+import { price, baseFee, tentPrice, pageNames } from "./info";
 import { nanoid } from "nanoid";
 
 import { Button, Spinner } from "../base";
@@ -23,12 +23,14 @@ export const Sale = () => {
   const [page, setPage] = createSignal(0);
   const [disabled, setDisabled] = createSignal(false);
 
+  const [place, setPlace] = createSignal(-1);
+
   const [shareEmail, setShareEmail] = createSignal(false);
   const [sharedEmail, setSharedEmail] = createSignal("");
 
-  const [creditCard, setCreditCard] = createSignal("1111 1111 1111 1111");
-  const [expiration, setExpiration] = createSignal("11/11");
-  const [cvv, setCvv] = createSignal("111");
+  const [creditCard, setCreditCard] = createSignal("");
+  const [expiration, setExpiration] = createSignal("");
+  const [cvv, setCvv] = createSignal("");
 
   const [isReserving, setIsReserving] = createSignal(false);
   const [isFullfilling, setIsFullfilling] = createSignal(false);
@@ -36,8 +38,8 @@ export const Sale = () => {
   const [reserveInfo, setReserveInfo] = createSignal(null);
 
   const [people, setPeople] = createSignal({
-    regular: 1,
-    vip: 1,
+    regular: 0,
+    vip: 0,
   });
 
   const [infos, setInfos] = createSignal({
@@ -112,8 +114,11 @@ export const Sale = () => {
   const isDisabled = createMemo(() => {
     return (
       disabled() ||
-      (page() == 2 && (!emailsValid() || !infosValid())) ||
-      (page() == 4 && !billingValid()) ||
+      place() < 0 ||
+      totalPeople() === 0 ||
+      (page() === 0 && spots().value[place()].available < totalPeople()) ||
+      (page() === 2 && (!emailsValid() || !infosValid())) ||
+      (page() === 4 && !billingValid()) ||
       isReserving() ||
       isFullfilling()
     );
@@ -135,7 +140,10 @@ export const Sale = () => {
       setIsReserving(true);
 
       try {
-        const result = await reserve("Alfheim", totalPeople());
+        const result = await reserve(
+          spots().value[place()].area,
+          totalPeople(),
+        );
 
         if (!result.id)
           throw new Error(`Error while reserving. ${result.message}`);
@@ -205,19 +213,40 @@ export const Sale = () => {
   };
 
   return (
-    <div class="w-[600px]">
-      <div class="flex items-center justify-between">
-        <h2 class="mb-2 text-2xl font-semibold">Place</h2>
-      </div>
+    <div class="w-full max-w-[600px]">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <h2 class="mb-2 text-center text-2xl">
+          <img
+            alt="Place"
+            src="/svgs/foo-festival-logo.svg"
+            class="mx-auto h-10 sm:mx-0"
+          />
+        </h2>
 
-      <div class="grid grid-cols-2 gap-3">
-        <div class="flex flex-col gap-2">
-          <Side {...{ spots, page, people, tents, realPrice }} />
+        <div>
+          <p class="mb-1 text-right text-lg font-medium">
+            {page() + 1}. {pageNames[page()]}
+          </p>
 
-          <div class="px-2 text-lg">
-            <p>Address</p>
-            <p>50 slots</p>
+          <div class="h-1.5 w-full rounded-full bg-gray-700">
+            <div
+              class="h-1.5 rounded-full bg-peach"
+              style:width={`${(page() / 6) * 100}%`}
+            ></div>
           </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <Side
+            {...{
+              spots,
+              place: [place, setPlace],
+              page,
+              people,
+              tents,
+              realPrice,
+            }}
+          />
         </div>
 
         <div class="flex flex-col gap-3">
@@ -269,9 +298,16 @@ export const Sale = () => {
                     type="button"
                     color="error"
                     onClick={() => {
-                      const currentPage = page();
+                      let currentPage = page();
 
                       if (currentPage === 1) setTents({ type: 0, count: 0 });
+
+                      if (
+                        currentPage === 2 &&
+                        totalPeople % 2 !== 0 &&
+                        totalPeople % 3 !== 3
+                      )
+                        currentPage--;
 
                       setDisabled(false);
                       setPage(currentPage - 1);

@@ -1,5 +1,5 @@
 import { Card, Toggle, Input } from "../../base";
-import { name } from "../info";
+import { ticketName, ticketColor } from "../info";
 import { validateEmail } from "@/lib/validate";
 
 export const TicketInfos = ({
@@ -66,8 +66,8 @@ const TicketInfo = ({
   return (
     <Card class="gap-2">
       <div class="flex items-center justify-between gap-3">
-        <p class={"text-lg font-medium"}>
-          #{index + 1} {name[type]}
+        <p class={"text-lg font-medium " + ticketColor[type]}>
+          #{index + 1} {ticketName[type]}
         </p>
       </div>
 

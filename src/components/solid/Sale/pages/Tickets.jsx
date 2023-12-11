@@ -1,24 +1,26 @@
 import { Card, Button } from "../../base";
-import { price, name } from "../info";
+import { price, ticketName, ticketColor } from "../info";
 
 export const Tickets = ({ people }) => (
   <>
-    <Ticket type="regular" people={people} color="text-blue">
+    <Ticket type="regular" people={people}>
       Lorem ipsum dolor sit amet con sectetur adipisicing elit. Quisqu am, volup
       tatibus.
     </Ticket>
 
-    <Ticket type="vip" people={people} color="text-peach">
+    <Ticket type="vip" people={people}>
       Lorem ipsum dolor sit amet con sectetur adipisicing elit. Quisqu am, volup
       tatibus.
     </Ticket>
   </>
 );
 
-const Ticket = ({ type, people: [people, setPeople], children, color }) => (
+const Ticket = ({ type, people: [people, setPeople], children }) => (
   <Card>
     <div class="flex items-center justify-between gap-3">
-      <p class={`text-lg font-medium ${color}`}>{name[type]}</p>
+      <p class={`text-lg font-medium ${ticketColor[type]}`}>
+        {ticketName[type]}
+      </p>
       <p class="text-lg font-medium">
         {price[type]} <span class="text-subtext0">DKK</span>
       </p>

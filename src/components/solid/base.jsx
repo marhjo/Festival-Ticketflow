@@ -8,7 +8,7 @@ import { spinner } from "@/styles/spinner";
 
 const create =
   (comp, tvfn) =>
-  ({ children, reactive, ...props }) => {
+  ({ as: a, children, reactive, ...props }) => {
     props ??= {};
 
     const styleProps = createMemo(() => {
@@ -26,7 +26,11 @@ const create =
     });
 
     return (
-      <Dynamic component={comp} {...props} class={styleProps()}>
+      <Dynamic
+        component={a ? (typeof a === "function" ? a() : a) || comp : comp}
+        {...props}
+        class={styleProps()}
+      >
         {children}
       </Dynamic>
     );

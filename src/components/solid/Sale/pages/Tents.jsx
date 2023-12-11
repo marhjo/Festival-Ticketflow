@@ -13,7 +13,7 @@ const Tent = ({ count, tents: [tents, setTents], many }) => {
     let base = "cursor-pointer border-2 transition-[border]";
 
     if (tents().type === count) {
-      base += " border-blue";
+      base += " border-peach";
     } else {
       base += " border-transparent";
     }

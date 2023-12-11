@@ -27,7 +27,7 @@ export const Billing = ({
   return (
     <Card class="gap-2">
       <div class="flex items-center justify-between gap-3">
-        <p class="text-lg font-medium">Payment Info</p>
+        <p class="text-lg font-medium">Payment Details</p>
       </div>
 
       <div class="w-full">

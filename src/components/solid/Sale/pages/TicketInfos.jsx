@@ -61,7 +61,16 @@ const TicketInfo = ({
 
   const email = () => emails()[type][index] ?? "";
 
-  const validEmail = () => email() === "" || validateEmail(email());
+  const validEmail = () =>
+    email().trim() === "" || validateEmail(email().trim());
+
+  const isDone = () => {
+    if (info().firstName.trim() === "") return false;
+    if (info().lastName.trim() === "") return false;
+    if (!shareEmail() && !validateEmail(email().trim())) return false;
+
+    return true;
+  };
 
   return (
     <Card class="gap-2">
@@ -69,6 +78,12 @@ const TicketInfo = ({
         <p class={"text-lg font-medium " + ticketColor[type]}>
           #{index + 1} {ticketName[type]}
         </p>
+
+        <div
+          class={
+            "h-3 w-3 rounded-full " + (isDone() ? "bg-green" : "bg-red-400")
+          }
+        />
       </div>
 
       <div class="flex gap-2">

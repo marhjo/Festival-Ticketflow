@@ -7,12 +7,12 @@ export const ConfirmAge = ({ setDisabled }) => {
   setDisabled(true);
 
   return (
-    <Card class="items-center gap-2">
+    <Card class="items-center gap-4">
       <p class="text-lg font-medium">Confirm Age</p>
 
       <p>
-        You must be 18 years or older to attend this event. Please confirm you
-        are of age.
+        Please confirm that all ticket purchasers are 18 or older, as this is a
+        requirement to attend the festival.
       </p>
 
       <div className="flex items-center gap-1">

@@ -4,6 +4,7 @@ import { reserve } from "@/lib/queries/reserve";
 import { fullfill } from "@/lib/queries/fullfill";
 import { addPeople } from "@/lib/supabase/addPeople";
 import { getAvailableSpots } from "@/lib/gets/getAvailableSpots";
+import { useTime } from "../signals/useTime";
 import { price, baseFee, tentPrice, pageNames } from "./info";
 import { nanoid } from "nanoid";
 
@@ -18,6 +19,7 @@ import { Confirm } from "./pages/Confirm";
 import { Done } from "./pages/Done";
 
 export const Sale = () => {
+  const time = useTime();
   const spots = getAvailableSpots();
 
   const [page, setPage] = createSignal(0);
@@ -81,7 +83,7 @@ export const Sale = () => {
     const e = emails();
     const p = people();
 
-    if (isShared) return validateEmail(shared);
+    if (isShared) return validateEmail(shared.trim());
 
     return Object.keys(e).every((key) =>
       new Array(p[key])
@@ -111,6 +113,14 @@ export const Sale = () => {
     return c.length >= 10 && e.length == 5 && cv.length == 3;
   });
 
+  const reservationValid = createMemo(() => {
+    const info = reserveInfo();
+
+    if (!info) return false;
+
+    return info.when + info.result.timeout >= time();
+  });
+
   const isDisabled = createMemo(() => {
     return (
       disabled() ||
@@ -119,6 +129,7 @@ export const Sale = () => {
       (page() === 0 && spots().value[place()].available < totalPeople()) ||
       (page() === 2 && (!emailsValid() || !infosValid())) ||
       (page() === 4 && !billingValid()) ||
+      (page() === 5 && !reservationValid()) ||
       isReserving() ||
       isFullfilling()
     );
@@ -150,7 +161,7 @@ export const Sale = () => {
 
         setReserveInfo({
           result,
-          when: Date.now(),
+          when: Date.now() - 5000,
         });
       } catch (error) {
         // TODO: Show error
@@ -182,9 +193,9 @@ export const Sale = () => {
         const supaResult = await addPeople(
           Object.keys(p).reduce((acc, type) => {
             const people = new Array(p[type]).fill(null).map((_, index) => ({
-              firstname: i[type][index].firstName,
-              lastname: i[type][index].lastName,
-              mail: sharing ? shared : e[type][index],
+              firstname: i[type][index].firstName.trim(),
+              lastname: i[type][index].lastName.trim(),
+              mail: (sharing ? shared : e[type][index]).trim(),
               vip: type === "vip",
               id: nanoid(),
               orderid: id,
@@ -216,11 +227,14 @@ export const Sale = () => {
     <div class="w-full max-w-[600px]">
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <h2 class="mb-2 text-center text-2xl">
-          <img
-            alt="Place"
-            src="/svgs/foo-festival-logo.svg"
-            class="mx-auto h-10 sm:mx-0"
-          />
+          {/* Add Link Eventually */}
+          <a href="/">
+            <img
+              alt="Place"
+              src="/svgs/foo-festival-logo.svg"
+              class="mx-auto h-10 sm:mx-0"
+            />
+          </a>
         </h2>
 
         <div>
@@ -230,7 +244,7 @@ export const Sale = () => {
 
           <div class="h-1.5 w-full rounded-full bg-gray-700">
             <div
-              class="h-1.5 rounded-full bg-peach"
+              class="h-1.5 rounded-full bg-peach transition-[width]"
               style:width={`${(page() / 6) * 100}%`}
             ></div>
           </div>
@@ -278,9 +292,9 @@ export const Sale = () => {
             />
           )}
 
-          {page() === 5 && <Confirm reserveInfo={reserveInfo} />}
+          {page() === 5 && <Confirm {...{ reserveInfo, reservationValid }} />}
 
-          {page() === 6 && <Done reserveInfo={reserveInfo} />}
+          {page() === 6 && <Done {...{ reserveInfo }} />}
 
           {page() < 5 && (
             <p class="text-right text-lg font-medium">
@@ -304,8 +318,8 @@ export const Sale = () => {
 
                       if (
                         currentPage === 2 &&
-                        totalPeople % 2 !== 0 &&
-                        totalPeople % 3 !== 3
+                        totalPeople() % 2 !== 0 &&
+                        totalPeople() % 3 !== 0
                       )
                         currentPage--;
 

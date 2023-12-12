@@ -7,7 +7,7 @@ export const button = tv({
       primary: "bg-peach text-white",
       secondary: "bg-blue-500 text-white",
       error: "bg-red-400 text-white",
-      disabled: "cursor-default bg-gray-400 text-white",
+      disabled: "cursor-default bg-gray-500 text-white",
     },
     size: {
       md: "px-3 py-2",

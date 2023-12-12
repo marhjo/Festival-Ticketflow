@@ -1,5 +1,11 @@
 ---
 import { Sale } from "../components/solid/Sale";
+
+const name = "Foo Festival";
+const description =
+  "We gathered 120 artist from all over the world and bring them to you in a week full of togetherness and music.";
+const themeColor = "#1e2030";
+const url = "https://astro-solid-foofighter.vercel.app/";
 ---
 
 <html lang="en">
@@ -7,8 +13,31 @@ import { Sale } from "../components/solid/Sale";
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover"
+      content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover"
     />
+
+    <!-- General -->
+
+    <meta name="application-name" content={name} />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content={themeColor} />
+
+    <!-- Twitter -->
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:url" content={url} />
+    <meta name="twitter:title" content={name} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:creator" content="FooFest Organizers" />
+
+    <!-- OpenGraph -->
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={name} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content={name} />
+    <meta property="og:url" content={url} />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>Foo Festival</title>

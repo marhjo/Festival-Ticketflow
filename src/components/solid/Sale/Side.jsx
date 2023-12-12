@@ -41,12 +41,19 @@ export const Side = ({
 
                 <label
                   for={spot().area}
-                  class="inline-flex w-full cursor-pointer items-center justify-between rounded-lg border border-transparent p-4 hover:bg-base peer-checked:border-peach peer-checked:text-peach"
+                  class={`
+                    inline-flex w-full cursor-pointer items-center gap-3 rounded-lg border border-transparent
+                    p-4 before:h-4 before:w-4 before:rounded-full before:border-2 before:border-gray-500
+                    before:bg-base before:content-[''] hover:bg-base peer-checked:border-peach
+                    peer-checked:text-peach before:peer-checked:border-4 before:peer-checked:border-peach
+                  `}
                   onClick={() => {
                     setPlace(i);
                   }}
                 >
                   <p>{spot().area}</p>
+
+                  <div class="flex-grow" />
 
                   <p>
                     {spot().available}/{spot().spots}
@@ -62,8 +69,6 @@ export const Side = ({
 
       {page() === 1 && (
         <>
-          <p class="mb-4 w-full text-left text-lg font-medium">Tents</p>
-
           <div class="px-8">
             <img alt="" src="/svgs/tent.svg" />
           </div>

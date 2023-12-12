@@ -4,13 +4,12 @@ import { price, ticketName, ticketColor } from "../info";
 export const Tickets = ({ people }) => (
   <>
     <Ticket type="regular" people={people}>
-      Lorem ipsum dolor sit amet con sectetur adipisicing elit. Quisqu am, volup
-      tatibus.
+      Regular Ticket: Full-day festival access, live music, and food stalls.
     </Ticket>
 
     <Ticket type="vip" people={people}>
-      Lorem ipsum dolor sit amet con sectetur adipisicing elit. Quisqu am, volup
-      tatibus.
+      VIP Ticket: All-access, priority seating, backstage pass, and free
+      merchandise.
     </Ticket>
   </>
 );

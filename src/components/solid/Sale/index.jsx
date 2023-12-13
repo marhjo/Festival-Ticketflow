@@ -223,12 +223,18 @@ export const Sale = () => {
     if (set) setPage(nextPage);
   };
 
+  createEffect(() => {
+    if (place() !== -1) return;
+    if (!spots().value) return;
+
+    setPlace(0);
+  });
+
   return (
     <div class="w-full max-w-[600px]">
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <h2 class="mb-2 text-center text-2xl">
-          {/* Add Link Eventually */}
-          <a href="/">
+          <a href="https://milk-foofest.vercel.app/">
             <img
               alt="Place"
               src="/svgs/foo-festival-logo.svg"
@@ -250,7 +256,7 @@ export const Sale = () => {
           </div>
         </div>
 
-        <div class="flex flex-col gap-2">
+        <div class="order-2 flex flex-col gap-2 sm:order-none">
           <Side
             {...{
               spots,
@@ -263,7 +269,7 @@ export const Sale = () => {
           />
         </div>
 
-        <div class="flex flex-col gap-3">
+        <div class="order-1 flex flex-col gap-3 sm:order-none">
           {page() === 0 && <Tickets people={[people, setPeople]} />}
 
           {page() === 1 && (
@@ -295,14 +301,18 @@ export const Sale = () => {
           {page() === 5 && <Confirm {...{ reserveInfo, reservationValid }} />}
 
           {page() === 6 && <Done {...{ reserveInfo }} />}
+        </div>
 
+        <div />
+
+        <div class="order-last sm:order-none">
           {page() < 5 && (
-            <p class="text-right text-lg font-medium">
+            <p class="mb-2 text-right text-lg font-medium">
               Total: {realPrice()} <span class="text-subtext0">DKK</span>
             </p>
           )}
 
-          <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center justify-between gap-3 sm:order-none">
             <div />
 
             {page() < 6 && (

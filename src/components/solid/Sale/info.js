@@ -1,7 +1,7 @@
 export const baseFee = 99;
 
 export const pageNames = [
-  "Tickets",
+  "Tickets & Camping Area",
   "Extras",
   "Personal Info",
   "Age Confirmation",

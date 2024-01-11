@@ -1,3 +1,4 @@
+// Index Imports
 import { createEffect, createMemo, createSignal } from "solid-js";
 import { validateEmail } from "@/lib/validate";
 import { reserve } from "@/lib/queries/reserve";
@@ -19,9 +20,11 @@ import { Confirm } from "./pages/Confirm";
 import { Done } from "./pages/Done";
 
 export const Sale = () => {
+  // Up to date info
   const time = useTime();
   const spots = getAvailableSpots();
 
+  // Lots of stored data
   const [page, setPage] = createSignal(0);
   const [disabled, setDisabled] = createSignal(false);
 
@@ -59,10 +62,12 @@ export const Sale = () => {
     count: 0,
   });
 
+  // Calculates total amount of people
   const totalPeople = createMemo(() =>
     Object.values(people()).reduce((acc, val) => acc + val, 0),
   );
 
+  // Calculates real price of everything
   const realPrice = createMemo(() => {
     const values = people();
     const tent = tents();
@@ -77,6 +82,8 @@ export const Sale = () => {
     );
   });
 
+  // Makes sure that the emails are valid
+  // Uses the shared email if it is shared
   const emailsValid = createMemo(() => {
     const isShared = shareEmail();
     const shared = sharedEmail();
@@ -92,6 +99,8 @@ export const Sale = () => {
     );
   });
 
+  // Makes sure that the infos are valid
+  // Only does simple check that the first and last name is not empty
   const infosValid = createMemo(() => {
     const i = infos();
     const p = people();
@@ -105,6 +114,8 @@ export const Sale = () => {
     );
   });
 
+  // Makes sure that the billing info is valid
+  // Check is simple, doesn't check if the card is real
   const billingValid = createMemo(() => {
     const c = creditCard() || "";
     const e = expiration() || "";
@@ -113,6 +124,8 @@ export const Sale = () => {
     return c.length >= 10 && e.length == 5 && cv.length == 3;
   });
 
+  // Makes sure that the reservation is valid
+  // Checks if the reservation is still valid based on the timestamp
   const reservationValid = createMemo(() => {
     const info = reserveInfo();
 
@@ -121,32 +134,45 @@ export const Sale = () => {
     return info.when + info.result.timeout >= time();
   });
 
+  // Does multiple checks to see if the button should be disabled
   const isDisabled = createMemo(() => {
     return (
+      // General disability check
       disabled() ||
+      // Checks if the place is valid
       place() < 0 ||
+      // Checks if total people over 0
       totalPeople() === 0 ||
+      // On page 1 if there are enough spots
       (page() === 0 && spots().value[place()].available < totalPeople()) ||
+      // On page 3 checks that emails and infos are valid
       (page() === 2 && (!emailsValid() || !infosValid())) ||
+      // On page 5 checks that the billing info is valid
       (page() === 4 && !billingValid()) ||
+      // On page 6 checks that the reservation is valid
       (page() === 5 && !reservationValid()) ||
+      // Checks if the reservation is being made
       isReserving() ||
+      // Checks if the reservation is being fullfilled
       isFullfilling()
     );
   });
 
+  // Handles the next button
   const onNext = async () => {
     if (isDisabled()) return;
 
     let nextPage = page() + 1;
     const peeps = totalPeople();
 
+    // If there are not enough spots, skip the tent page
     if (nextPage === 1 && (peeps < 2 || (peeps % 2 !== 0 && peeps % 3 !== 0))) {
       nextPage++;
     }
 
     let set = true;
 
+    // If the next page is 5, reserve the spot
     if (nextPage === 5) {
       setIsReserving(true);
 
@@ -172,6 +198,7 @@ export const Sale = () => {
       setIsReserving(false);
     }
 
+    // If the next page is 6, fullfill the reservation
     if (nextPage === 6) {
       setIsFullfilling(true);
 
@@ -190,6 +217,7 @@ export const Sale = () => {
         const sharing = shareEmail();
         const shared = sharedEmail();
 
+        // Sends information to supabase to be stored
         const supaResult = await addPeople(
           Object.keys(p).reduce((acc, type) => {
             const people = new Array(p[type]).fill(null).map((_, index) => ({
@@ -223,6 +251,7 @@ export const Sale = () => {
     if (set) setPage(nextPage);
   };
 
+  // If no sppot is selected, select the first one
   createEffect(() => {
     if (place() !== -1) return;
     if (!spots().value) return;
@@ -233,6 +262,7 @@ export const Sale = () => {
   return (
     <div class="w-full max-w-[600px]">
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {/* Project logo */}
         <h2 class="mb-2 text-center text-2xl">
           <a href="https://milk-foofest.vercel.app/">
             <img
@@ -243,6 +273,7 @@ export const Sale = () => {
           </a>
         </h2>
 
+        {/* Page index and progress bar */}
         <div>
           <p class="mb-1 text-right text-lg font-medium">
             {page() + 1}. {pageNames[page()]}
@@ -256,6 +287,7 @@ export const Sale = () => {
           </div>
         </div>
 
+        {/* Side card */}
         <div class="order-2 flex flex-col gap-2 sm:order-none">
           <Side
             {...{
@@ -269,6 +301,7 @@ export const Sale = () => {
           />
         </div>
 
+        {/* All different pages */}
         <div class="order-1 flex flex-col gap-3 sm:order-none">
           {page() === 0 && <Tickets people={[people, setPeople]} />}
 
@@ -317,6 +350,7 @@ export const Sale = () => {
 
             {page() < 6 && (
               <div class="flex items-center justify-end gap-3">
+                {/* Button to go back a page */}
                 {page() > 0 && (
                   <Button
                     type="button"
@@ -341,6 +375,7 @@ export const Sale = () => {
                   </Button>
                 )}
 
+                {/* Button to go to the next page */}
                 <Button
                   type="button"
                   reactive={{

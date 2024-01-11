@@ -3,19 +3,19 @@
 Jeg har en generel forståelse af selve koden, men har ikke selv skrevet den og har ikke styr på alle dele af den*/
 }
 
-// Importér nødvendige hooks fra SolidJS.
+// Import necessary SolidJS functions.
 import { createMemo, createEffect, createSignal } from "solid-js";
 
-// Initialiser cache, listeners og handlers objekter.
+// Initialize cache, listeners and handlers.
 const cache = {};
 const listeners = {};
 const handlers = {};
 
-// Definer en funktion til at oprette en query.
+// Defines the createQuery function.
 export const createQuery = ({ key, fn, refetch }) => {
   const hashedKey = createMemo(() => ({ hash: hashKey(key()), input: key() }));
 
-  // Opret et reaktivt signal for query's værdi eller loading state.
+  // Creates a signal and sets the value to the cached value or a loading state.
   const [value, setValue] = createSignal(
     cache[hashedKey().hash] || { loading: true },
   );

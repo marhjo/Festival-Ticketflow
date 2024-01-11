@@ -6,6 +6,8 @@ export const Billing = ({
   expiration: [expiration, setExpiration],
   cvv: [cvv, setCvv],
 }) => {
+  // Initialize Cleave.js on the client.
+  // Make sure is only run on the client, Cleave uses document.
   if (typeof document !== "undefined") {
     setTimeout(() => {
       new Cleave("#__credit_card", {
@@ -30,6 +32,7 @@ export const Billing = ({
         <p class="text-lg font-medium">Payment Details</p>
       </div>
 
+      {/* Credit Card input */}
       <div class="w-full">
         <p class="mb-1 text-sm font-medium">Credit Card</p>
 
@@ -43,6 +46,7 @@ export const Billing = ({
         />
       </div>
 
+      {/* Expiration input */}
       <div className="flex gap-2">
         <div class="w-full">
           <p class="mb-1 text-sm font-medium">Expiration</p>
@@ -57,6 +61,7 @@ export const Billing = ({
           />
         </div>
 
+        {/* CVV input */}
         <div class="w-full">
           <p class="mb-1 text-sm font-medium">CVV</p>
 

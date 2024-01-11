@@ -4,6 +4,7 @@ import { createSignal } from "solid-js";
 export const ConfirmAge = ({ setDisabled }) => {
   const [age, setAge] = createSignal(false);
 
+  // Sets page as disabled by default, will be overridden if age is confirmed
   setDisabled(true);
 
   return (

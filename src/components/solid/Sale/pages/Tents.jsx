@@ -9,6 +9,7 @@ export const Tents = ({ count, tents }) => (
 );
 
 const Tent = ({ count, tents: [tents, setTents], many }) => {
+  // Dynamic classes based on if the tent is selected or not
   const classes = () => {
     let base = "cursor-pointer border-2 transition-[border]";
 
@@ -26,6 +27,7 @@ const Tent = ({ count, tents: [tents, setTents], many }) => {
       reactive={{
         class: classes,
       }}
+      // Set the tent type and count
       on:click={() =>
         setTents((tent) =>
           count === tent.type

@@ -16,6 +16,7 @@ export const Tickets = ({ people }) => (
 
 const Ticket = ({ type, people: [people, setPeople], children }) => (
   <Card>
+    {/* Ticket info */}
     <div class="flex items-center justify-between gap-3">
       <p class={`text-lg font-medium ${ticketColor[type]}`}>
         {ticketName[type]}
@@ -28,6 +29,7 @@ const Ticket = ({ type, people: [people, setPeople], children }) => (
     <p class="mt-[-8px]">{children}</p>
 
     <div class="flex items-center justify-end gap-2">
+      {/* Button to remove tickets */}
       <Button
         type="button"
         size="sm"
@@ -47,6 +49,7 @@ const Ticket = ({ type, people: [people, setPeople], children }) => (
 
       <p class="px-[2px] text-lg font-medium">{people()[type]}</p>
 
+      {/* Button to add tickets */}
       <Button
         type="button"
         size="sm"

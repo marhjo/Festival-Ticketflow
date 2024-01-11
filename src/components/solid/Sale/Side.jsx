@@ -10,6 +10,7 @@ export const Side = ({
   tents,
   realPrice,
 }) => {
+  // Different available spots
   const differentSpots = createMemo(() =>
     spots().value ? spots().value.length : 0,
   );
@@ -23,6 +24,7 @@ export const Side = ({
           (page() === 0 ? " p-1 gap-0" : ""),
       }}
     >
+      {/* Shows the different spots for the user to choose from */}
       {page() === 0 && (
         <>
           {new Array(differentSpots()).fill(null).map((_, i) => {
@@ -67,6 +69,7 @@ export const Side = ({
         </>
       )}
 
+      {/* Shows an image of the tent graphic */}
       {page() === 1 && (
         <>
           <div class="px-8">
@@ -75,11 +78,13 @@ export const Side = ({
         </>
       )}
 
+      {/* Shows the breakdown of the price */}
       {page() >= 2 && (
         <>
           <p class="w-full text-left text-lg font-medium">Breakdown</p>
 
           <div class="flex w-full flex-col items-center justify-between gap-1">
+            {/* Different prices to show */}
             {[
               null,
               {
@@ -97,6 +102,7 @@ export const Side = ({
               null,
               { name: "Total", count: 1, price: realPrice() },
             ].map((value) => {
+              // Show a divider
               if (value === null) {
                 return (
                   <div class="my-3 w-full px-1">
@@ -111,6 +117,7 @@ export const Side = ({
 
               const x = count > 1 ? " x " + count : "";
 
+              // Show the price
               return (
                 <div class="flex w-full items-center justify-between">
                   <div>

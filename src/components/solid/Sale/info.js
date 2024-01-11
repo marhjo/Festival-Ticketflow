@@ -1,3 +1,4 @@
+// General info for the page
 export const baseFee = 99;
 
 export const pageNames = [

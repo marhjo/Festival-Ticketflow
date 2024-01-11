@@ -1,6 +1,6 @@
 import { supabase } from ".";
 
-// Eksporterer en asynkron funktion til at tilføje personer til databasen.
+// Exports an async function that adds people to the database.
 export const addPeople = async (people) =>
   await supabase.from("FooFestInfo").insert(people, {
     returning: "minimal",

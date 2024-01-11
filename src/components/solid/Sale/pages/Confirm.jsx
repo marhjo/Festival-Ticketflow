@@ -5,10 +5,13 @@ import { useTime } from "../../signals/useTime";
 export const Confirm = ({ reserveInfo, reservationValid }) => {
   const time = useTime();
 
+  // Create a memoized value for the visual time based on the reserveInfo
   const visualTime = createMemo(() => {
     const info = reserveInfo();
     const diff = info.when + info.result.timeout - time();
 
+    // If the difference is less than 0, return 00:00
+    // Default for time bugs in browsers
     if (diff < 0) return "00:00";
 
     const result = new Date(diff);
@@ -22,6 +25,7 @@ export const Confirm = ({ reserveInfo, reservationValid }) => {
   return (
     <Card>
       <div class="flex flex-col gap-2">
+        {/* Show the confirm page if the reservation is valid */}
         {reservationValid() && (
           <>
             <p class="mb-1 text-center text-lg font-medium">
@@ -39,6 +43,7 @@ export const Confirm = ({ reserveInfo, reservationValid }) => {
           </>
         )}
 
+        {/* Show the expired page if the reservation is invalid */}
         {!reservationValid() && (
           <>
             <p class="mb-1 text-center text-lg font-medium">

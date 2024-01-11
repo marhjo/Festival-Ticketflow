@@ -6,6 +6,8 @@ import { input } from "@/styles/input";
 import { toggle } from "@/styles/toggle";
 import { spinner } from "@/styles/spinner";
 
+// Create component factory
+// Creates reactive variables
 const create =
   (comp, tvfn) =>
   ({ as: a, children, reactive, ...props }) => {
@@ -36,10 +38,12 @@ const create =
     );
   };
 
+// Base components
 export const Button = create("button", button);
 export const Card = create("div", card);
 export const Input = create("input", input);
 
+// Toggle component
 export const Toggle = ({ children: _, state: [state, setState], ...props }) => {
   const styles = toggle(props);
 
@@ -57,6 +61,7 @@ export const Toggle = ({ children: _, state: [state, setState], ...props }) => {
   );
 };
 
+// Spinner component
 export const Spinner = ({ children: _, class: c, ...props }) => {
   const styles = spinner(props);
 

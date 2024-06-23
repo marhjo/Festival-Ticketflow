@@ -26,7 +26,7 @@ This project was developed for an imaginary festival, focusing on creating a Tic
 
 ## Contributions
 
-This part of the site, the Ticket Flow page, was a solo endeavor, allowing me to dive deep into new technologies and implement a full-featured Ticket Flow page. The rest of the project was developed in a group, and can be found [here](https://github.com/marhjo/Mark-Base-Foof).
+This part of the site, the Ticket Flow page, was a solo endeavor, allowing me to dive deep into new technologies and implement a full-featured Ticket Flow page. The rest of the project was developed in a group, and can be found [here](https://github.com/marhjo/Festival-BasePage).
 
 ## License
 
